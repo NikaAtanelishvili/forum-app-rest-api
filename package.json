@@ -1,0 +1,26 @@
+{
+  "name": "my-rest-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NikaAtanelishvili/rest-api.git"
+  },
+  "author": "Nika Atanelishvili",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NikaAtanelishvili/rest-api/issues"
+  },
+  "homepage": "https://github.com/NikaAtanelishvili/rest-api#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
