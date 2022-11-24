@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const feedRoutes = require("./routes/feed");
 
@@ -20,7 +21,13 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
+
 // routes
 app.use("/feed", feedRoutes);
 
-app.listen(8080);
+mongoose
+  .connect(
+    "mongodb+srv://Nika:QyO4r9vObDXa1nTr@messaging-app.jjmnrd2.mongodb.net/messages?retryWrites=true&w=majority"
+  )
+  .then((res) => app.listen(8080))
+  .catch((err) => console.log(err));
