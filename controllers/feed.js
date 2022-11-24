@@ -4,13 +4,24 @@ const Post = require("../models/post");
 const fs = require("fs");
 const path = require("path");
 
+const POST_PER_PAGE = 5;
+
+// ===============================================================================================
+
 exports.getPosts = async (req, res, next) => {
   try {
-    const posts = await Post.find();
+    const currentPage = req.query.page || 1;
+
+    const totalItems = await Post.find().countDocuments();
+
+    const posts = await Post.find()
+      .skip((currentPage - 1) * POST_PER_PAGE)
+      .limit(POST_PER_PAGE);
 
     res.status(200).json({
       message: "Fetched Posts successfully",
       posts: posts,
+      totalItems: totalItems,
     });
   } catch {
     if (!err.statusCode) {
@@ -19,6 +30,8 @@ exports.getPosts = async (req, res, next) => {
     next(err);
   }
 };
+
+// ===============================================================================================
 
 exports.createPost = async (req, res, next) => {
   try {
@@ -64,6 +77,8 @@ exports.createPost = async (req, res, next) => {
   }
 };
 
+// ===============================================================================================
+
 exports.getPost = async (req, res, next) => {
   try {
     const postId = req.params.postId;
@@ -87,6 +102,8 @@ exports.getPost = async (req, res, next) => {
     next(err);
   }
 };
+
+// ===============================================================================================
 
 exports.updatePost = async (req, res, next) => {
   try {
@@ -140,6 +157,8 @@ exports.updatePost = async (req, res, next) => {
   }
 };
 
+// ===============================================================================================
+
 exports.deletePost = async (req, res, next) => {
   try {
     const postId = req.params.postId;
@@ -168,6 +187,8 @@ exports.deletePost = async (req, res, next) => {
     next(err);
   }
 };
+
+// ===============================================================================================
 
 const clearImage = (filePath) => {
   filePath = path.join(__dirname, "..", filePath);
