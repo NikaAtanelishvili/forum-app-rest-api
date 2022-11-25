@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 const Post = require("../models/post");
 const fs = require("fs");
 const path = require("path");
-
+const User = require("../models/user");
 const POST_PER_PAGE = 5;
 
 // ===============================================================================================
@@ -57,16 +57,23 @@ exports.createPost = async (req, res, next) => {
       title: title,
       content: content,
       imageUrl: imageUrl,
-      creator: { name: "NiKa" },
+      creator: req.userId,
     });
 
-    const result = await post.save();
+    await post.save();
 
-    console.log(result);
+    const user = await User.findById(req.userId);
+
+    user.posts.push(post);
+    await user.save();
 
     res.status(201).json({
       message: "Post created successfully",
-      post: result,
+      post: post,
+      creator: {
+        _id: user._id,
+        name: user.name,
+      },
     });
   } catch (err) {
     console.log(err);
@@ -136,6 +143,12 @@ exports.updatePost = async (req, res, next) => {
       throw error;
     }
 
+    if (post.creator.toString() !== req.userId) {
+      const error = new Error("Not authorized");
+      error.statusCode = 403;
+      throw error;
+    }
+
     if (imageUrl !== post.imageUrl) {
       clearImage(post.imageUrl);
     }
@@ -171,11 +184,22 @@ exports.deletePost = async (req, res, next) => {
       throw error;
     }
 
+    if (post.creator.toString() !== req.userId) {
+      const error = new Error("Not authorized");
+      error.statusCode = 403;
+      throw error;
+    }
+
     // checKed logged in user
 
     clearImage(post.imageUrl);
 
     await Post.findByIdAndRemove(postId);
+
+    // clear relation
+    const user = await User.findById(req.userId);
+    user.posts.pull(postId);
+    await user.save();
 
     res.status(200).json({
       message: "Deleted Post",
@@ -187,6 +211,8 @@ exports.deletePost = async (req, res, next) => {
     next(err);
   }
 };
+
+
 
 // ===============================================================================================
 
